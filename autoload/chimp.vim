@@ -39,7 +39,14 @@ endif
 
 "###### FUNCTIONS [ {{{ ]
 function! chimp#SendMessage(chimp, msg)
-	call chimp#SendLines(a:chimp, split(a:msg, "\\n", 1))
+	call chimp#SendLines(a:chimp, split(a:msg, "\\n", 0))
+endfunction
+
+function! chimp#SendToCurrent(msg)
+	if !exists("b:ChimpId")
+        call chimp#Connect()
+    endif
+    call chimp#SendMessage(b:ChimpId, a:msg)
 endfunction
 
 function! chimp#SendLines(chimp, lines)
@@ -48,6 +55,18 @@ function! chimp#SendLines(chimp, lines)
 	call system(g:chimp#ScreenCommand . ' -x ' . a:chimp
 				\ . ' -X eval "select 0" "readbuf" "paste ."')
 endfunction
+
+function! chimp#Connect()
+	if !exists("b:ChimpId")
+		let b:ChimpId = input("Please give Chimp Id: ")
+	endif
+endfunction
+
+function! chimp#ResetChimp()
+	unlet b:ChimpId
+	call chimp#Connect()
+endfunction
+
 "###### [ }}} ]
 
 "###### EPILOG [ {{{ ]
